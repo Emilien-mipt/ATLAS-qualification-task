@@ -115,6 +115,7 @@ void CountRMS( const char * partition, const char * filename){
 
     cout << "TEST after filling the histograms" << endl;
     hist_rms[40][0]->Draw();   
+    
     //Print
     cout << "Print values for RMS errors for partition " << partition << ": " << endl; 
     for(int ip=0; ip<48; ip++){

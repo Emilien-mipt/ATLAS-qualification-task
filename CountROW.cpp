@@ -260,7 +260,7 @@ void CountROW(const char *partition, int row_1, int row_2, int iopt=1000)
       std::cout << std::endl << std::endl;
     }
     err_y.clear();
-    err_y.resize(nsetsize, ratio_rms(iEBA,ip,row_1-1,row_2-1));
+    err_y.resize(nsetsize, ratio_rms(iLBC,ip,row_1-1,row_2-1));
     TGraphErrors *gr = new TGraphErrors(date_all[ip].size(),&(date_all[ip][0]),&(mean_all[ip][0]),&(err_x[0]),&(err_y[0]));
     gr->SetName(sname);
     gr->SetTitle(stitle);
