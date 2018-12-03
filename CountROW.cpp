@@ -29,6 +29,7 @@
 #include "csdate.cpp"
 //#include "CountRMS.cpp"
 #include "ratio_rms.cpp"
+#include "lumi_counter.cpp"
 
 #include "AtlasUtils.h"
 #include "AtlasLabels.h"
