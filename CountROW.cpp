@@ -216,6 +216,15 @@ void CountROW(const char *partition, int row_1, int row_2, int iopt=1000)
   std::vector<float> mean_all[48];
   std::vector<float> rms_all[48];
   std::vector<float> date_all[48];
+  std::vector<float> dose_all[48];  
+
+  float Dose[4][48][13] = {
+    #include "Dose_lb.list"
+    #include "Dose_lb.list"
+    #include "Dose_eb.list"
+    #include "Dose_eb.list"
+  };
+
 
   //Filling histograms
   for(int i=0; i<nsetsize; ++i){
@@ -230,6 +239,7 @@ void CountROW(const char *partition, int row_1, int row_2, int iopt=1000)
       showratio_row(partition, runs, row_1-1, row_2-1, mean, rms);
       for (int ip=0; ip<48; ++ip){
         if (rms[ip]>=0) {
+          double lumi = lumi_counter(runday[ipart][i], runmonth[ipart][i], runyear[ipart][i]);
           if (m_first[ip]) {
             m_first[ip] = false;
             mean_first[ip] = mean[ip];
@@ -237,13 +247,18 @@ void CountROW(const char *partition, int row_1, int row_2, int iopt=1000)
           hist_mean[ip]->Fill(mean[ip]-mean_first[ip]);
           hist_rms[ip]->Fill(rms[ip]);
           hprof_rms[ip]->Fill(dtim,rms[ip]);
-          mean_all[ip].push_back(mean[ip]-mean_first[ip]);
+          std::cout << "Lumi: " << lumi << endl;
+          std::cout << "Dose (row_1 - row_2): " << Dose[ipart][ip][row_1-1]-Dose[ipart][ip][row_2-1] << endl;
+          std::cout << "[Dose (row_1 - row_2)] * lumi: " << (Dose[ipart][ip][row_1-1]-Dose[ipart][ip][row_2-1])*lumi << endl;
+          mean_all[ip].push_back((mean[ip]-mean_first[ip]));
+          dose_all[ip].push_back((Dose[ipart][ip][row_1-1]-Dose[ipart][ip][row_2-1])*lumi/1000000.);
+          std::cout << "dose_all: " << dose_all[ip][i] << endl;
           rms_all[ip].push_back(rms[ip]);
           date_all[ip].push_back(dtim);
         }
-      }
+      } //PMT loop
     }
-  }
+  } //Netsize loop
 
   std::vector<float> err_x;
   std::vector<float> err_y;
@@ -261,13 +276,15 @@ void CountROW(const char *partition, int row_1, int row_2, int iopt=1000)
       std::cout << std::endl << std::endl;
     }
     err_y.clear();
-    err_y.resize(nsetsize, ratio_rms(iLBC,ip,row_1-1,row_2-1));
-    TGraphErrors *gr = new TGraphErrors(date_all[ip].size(),&(date_all[ip][0]),&(mean_all[ip][0]),&(err_x[0]),&(err_y[0]));
+    err_y.resize(nsetsize, ratio_rms(ipart,ip,row_1-1,row_2-1));
+    //TGraphErrors *gr = new TGraphErrors(date_all[ip].size(),&(date_all[ip][0]),&(mean_all[ip][0]),&(err_x[0]),&(err_y[0]));
+    TGraphErrors *gr = new TGraphErrors(dose_all[ip].size(),&(dose_all[ip][0]),&(mean_all[ip][0]),&(err_x[0]),&(err_y[0]));
     gr->SetName(sname);
     gr->SetTitle(stitle);
-    gr->GetXaxis()->SetTitle("Date [month and year]");
-    gr->GetXaxis()->SetTimeDisplay(1);
-    gr->GetXaxis()->SetTimeFormat(timeformat); 
+    //gr->GetXaxis()->SetTitle("Date [month and year]");
+    gr->GetXaxis()->SetTitle("Dose [Gy]");
+    //gr->GetXaxis()->SetTimeDisplay(1);
+    //gr->GetXaxis()->SetTimeFormat(timeformat); 
     gr->GetXaxis()->SetLabelOffset(0.02); 
     gr->GetYaxis()->SetTitle("Mean diff [%]");
     gr_diff[ip] = gr;
