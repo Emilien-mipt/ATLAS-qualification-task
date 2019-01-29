@@ -295,33 +295,13 @@ int showratio_row(const char *partition, vector<int> & runs, int row1, int row2,
         }
         if (R1.good[imod][ip][row1] && R1.good[imod][ip][row2]) {
           int_ratio[imod][ip] = R1.integrals[imod][ip][row1]/R1.integrals[imod][ip][row2];
-          //if (fabs(int_ratio[imod][ip]-1)<0.001) 
-          //    cout << run << " " << imod+1 << " " << ip+1 << " " << R1.integrals[imod][ip][row1] << " " << R1.integrals[imod][ip][row2] << endl;
           goodR[imod][ip] = true;
         }
-      }
-      if (goodR[imod]) {
-          //cout << modname0(partition,imod);
-        for (int ip = 0; ip < 48; ++ip){
-            //cout << " " << setw(5) << int_ratio[imod][ip];
-        }
-        //cout << endl;
-      } else {
-          //cout << modname0(partition,imod);
-          //if (!goodR[imod]) cout << " no data in run "<< run;
-          //cout << endl;
-      }
-    }
-
-    //string file1 = data_file(run);
-    //for (int imod = 0; imod < 65; ++imod){
-    //  if (goodR[imod]) readhv(file1.c_str(),partition,imod+1,R1.hv[imod],R1.temp[imod]);
-    //}
-  }
+      }//PMT loop
+    }//Modules loop
+  }//Runs loop
   
   // book and fill all histograms
-  //gDirectory->GetList()->Delete(); // delete old histograms first
-
   TH1F *hist[48];
   TString stitle, sname;
 
@@ -340,8 +320,7 @@ int showratio_row(const char *partition, vector<int> & runs, int row1, int row2,
     mean.push_back(hist[ip]->GetMean());
     if (hist[ip]->GetEntries() > 0) {
       rms.push_back(hist[ip]->GetRMS());
-      //if (fabs(hist[ip]->GetMean())<0.01)
-      //    cout << runs[0] << " " << ip+1 << " " << hist[ip]->GetEntries() << " " << hist[ip]->GetMean() << " " << hist[ip]->GetRMS() << endl;
+      //cout << "PMT: " << ip+1 << " RMS: " << hist[ip]->GetRMS() << endl;
     } else {
       rms.push_back(-0.1);
     }

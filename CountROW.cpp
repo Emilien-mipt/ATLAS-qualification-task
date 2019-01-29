@@ -58,9 +58,8 @@ int pad_pos(int n, int nx, int ny)
     return n1*nx+n2+1;
 }
 
-void CountROW(const char *partition, int row_1, int row_2, int iopt=1000)
+void CountROW(const char *partition, int row_1, int row_2, int iopt=4)
 {
-  //CountRMS("EBA", "EBA.list");
   const char *partname[nPART] = {"LBA","LBC","EBA","EBC"};
   int ipart=0;
   for ( ; ipart<nPART; ++ipart) {
@@ -247,12 +246,12 @@ void CountROW(const char *partition, int row_1, int row_2, int iopt=1000)
           hist_mean[ip]->Fill(mean[ip]-mean_first[ip]);
           hist_rms[ip]->Fill(rms[ip]);
           hprof_rms[ip]->Fill(dtim,rms[ip]);
-          std::cout << "Lumi: " << lumi << endl;
-          std::cout << "Dose (row_1 - row_2): " << Dose[ipart][ip][row_1-1]-Dose[ipart][ip][row_2-1] << endl;
-          std::cout << "[Dose (row_1 - row_2)] * lumi: " << (Dose[ipart][ip][row_1-1]-Dose[ipart][ip][row_2-1])*lumi << endl;
+          //std::cout << "Lumi: " << lumi << endl;
+          //std::cout << "Dose (row_1 - row_2): " << Dose[ipart][ip][row_1-1]-Dose[ipart][ip][row_2-1] << endl;
+          //std::cout << "[Dose (row_1 - row_2)] * lumi: " << (Dose[ipart][ip][row_1-1]-Dose[ipart][ip][row_2-1])*lumi << endl;
           mean_all[ip].push_back((mean[ip]-mean_first[ip]));
           dose_all[ip].push_back((Dose[ipart][ip][row_1-1]-Dose[ipart][ip][row_2-1])*lumi/1000000.);
-          std::cout << "dose_all: " << dose_all[ip][i] << endl;
+          //std::cout << "dose_all: " << dose_all[ip][i] << endl;
           rms_all[ip].push_back(rms[ip]);
           date_all[ip].push_back(dtim);
         }
@@ -260,6 +259,9 @@ void CountROW(const char *partition, int row_1, int row_2, int iopt=1000)
     }
   } //Netsize loop
 
+
+
+//Defining TGraph
   std::vector<float> err_x;
   std::vector<float> err_y;
   err_x.resize(nsetsize,0.0);
@@ -300,6 +302,7 @@ void CountROW(const char *partition, int row_1, int row_2, int iopt=1000)
   std::vector<TCanvas *> c3;
   std::vector<TCanvas *> c4;
   TCanvas *c = 0;
+  TCanvas *C = new TCanvas();
   
   int nx=3;
   int ny=2;
@@ -307,7 +310,8 @@ void CountROW(const char *partition, int row_1, int row_2, int iopt=1000)
   int ic;
   int id;
 
-  if ((iopt>>0)%10) {
+
+  if (iopt == 0) {
     ic=0;
     id=999;
     for (int ip=0; ip<48; ++ip){
@@ -327,7 +331,7 @@ void CountROW(const char *partition, int row_1, int row_2, int iopt=1000)
     }
   }
 
-  if ((iopt>>1)%10) {
+  if (iopt == 1) {
     ic=0;
     id=999;
     for (int ip=0; ip<48; ++ip){
@@ -347,7 +351,7 @@ void CountROW(const char *partition, int row_1, int row_2, int iopt=1000)
     }
   }
 
-  if ((iopt>>2)%10) {
+  if (iopt == 2) {
     ic=0;
     id=999;
     for (int ip=0; ip<48; ++ip){
@@ -373,10 +377,12 @@ void CountROW(const char *partition, int row_1, int row_2, int iopt=1000)
     }
   }
   
-  if ((iopt>>3)%10) {
+  if (iopt == 3) { 
     ic=0;
     id=999;
     for (int ip=0; ip<48; ++ip){
+        std::cout << "PMT: " << ip << endl;
+        std::cout << "date_all.size() " << date_all[ip].size() << endl; 
       if (date_all[ip].size()) {
         if (id>=nxy) {
           ic+=1;
@@ -409,8 +415,81 @@ void CountROW(const char *partition, int row_1, int row_2, int iopt=1000)
     }
   }
 
+
+  if (iopt == 4) {
+     auto mg  = new TMultiGraph();
+     vector<int> marker_color = {1, 2, 3, 4, 5, 6, 7 ,8, 9, 28};
+     int triangle_up = 22;
+     int triangle_down = 23;
+     int marker_color_ind = 0;
+     vector<int> pmt_number;
+     
+     //Found the PMT numbers with non-zero values
+     for(int ip=0; ip<48; ip++){
+        if (date_all[ip].size()) {
+           pmt_number.push_back(ip);
+           cout << "Vector with PMT numbers: " << endl;
+           cout << ip << endl;
+        }
+     }
+
+     TGraphErrors * h1 = gr_diff[pmt_number[0]];
+     stitle.Form("%s pmt %d", cellnames[ipart][pmt_number[0]], pmt_number[0]+1);
+     cout << "First: " <<  cellnames[ipart][pmt_number[0]]<<endl;
+     h1->SetMarkerColor(marker_color[marker_color_ind]);
+     h1->SetMarkerStyle(triangle_up);
+     h1->SetTitle(stitle);
+     h1->SetFillStyle(0);
+     h1->SetMarkerSize(1.0);
+     mg->Add(h1);
+
+     for(int ip = 1; ip < pmt_number.size(); ip++){
+           cout << "Step " << ip << endl;
+           TGraphErrors * h = gr_diff[pmt_number[ip]];
+           stitle.Form("%s pmt %d", cellnames[ipart][pmt_number[ip]], pmt_number[ip]+1);
+           cout << cellnames[ipart][pmt_number[ip]] << endl;
+           cout << cellnames[ipart][pmt_number[ip-1]] << endl;
+           if(cellnames[ipart][pmt_number[ip]] == cellnames[ipart][pmt_number[ip-1]]){
+              cout << cellnames[ipart][pmt_number[ip]] << "Equal to " <<  cellnames[ipart][pmt_number[ip-1]]<< endl;
+              h->SetMarkerColor(marker_color[marker_color_ind]);
+              h->SetMarkerStyle(triangle_down);
+              h->SetTitle(stitle);
+              h->SetFillStyle(0);
+              h->SetMarkerSize(1.0);
+           }
+           else{
+              marker_color_ind++;
+              h->SetMarkerColor(marker_color[marker_color_ind]);
+              triangle_up = 22;
+              h->SetMarkerStyle(triangle_up);
+              h->SetTitle(stitle);
+              h->SetFillStyle(0);
+              h->SetMarkerSize(1.0);
+           }
+           mg->Add(h);
+     }
+
+
+
+
+     mg->Draw("AP");         
+     mg->GetXaxis()->SetTitle("Dose [Gy]");
+     mg->GetYaxis()->SetTitle("Mean diff [%]");
+     gPad->BuildLegend();   
+     //Set ATLAS style
+     //
+     //ATLASLabel(0.40, 0.86, "   Internal", 1);
+     //myText(0.40, 0.81, 1, "Tile Calorimeter");
+     sname.Form("%s Row %d - Row %d",partition,row_1,row_2);
+     myText(0.21, 0.21, 1, sname);
+  }
+   
   //save all canvas
   std::cout << "Saving Canvas..." << std::endl;
+  
+  sname.Form("C_%s_r%d_r%d.png",partition,row_1,row_2);
+  C->SaveAs(sname);
+
   for (size_t i=0; i<c1.size(); ++i) {
     sname.Form("c1_%s_r%d_r%d_p%lu.png",partition,row_1,row_2,i+1);
     c1[i]->SaveAs(sname);
