@@ -473,12 +473,16 @@ void CountROW(const char *partition, int row_1, int row_2, int iopt=4)
 
      gStyle->SetOptFit(0001); 
      mg->Draw("AP");       
+     //TF1 *f1 = new TF1("f1","expo",0,100);  
+     //TF1 *f1 = new TF1("f1","([0]*TMath::Exp(-[1]*x)-1) + [2] + [3]*x",0,100);  
+     //TF1 *f1 = new TF1("f1","[0]*(TMath::Exp(-x/[1])-1)",0,100);  
+     //TF1 *f1 = new TF1("f1","([0]*TMath::Exp(-[1]*x)-1) + ([2]*TMath::Exp(-[3]*x)-1)",0,100);  
      //TF1 *f1 = new TF1("f1","-[0]*TMath::Log([1]*x+1)",0,100);  
-     //TF1 *f1 = new TF1("f1","[0]*TMath::Exp([1]*x)-1",0,100);  
-     TF1 *f1 = new TF1("f1","pol1",0,100);  
+     TF1 *f1 = new TF1("f1","([0]*TMath::Exp(-[1]*x)-1) - ([0]*TMath::Log([1]*x+1))",0,100);  
+     //TF1 *f1 = new TF1("f1","pol1",0,100);  
      //TF1 *f1 = new TF1("f1","pol3",0,100);  
      //TF1 *f1 = new TF1("f1","pol4",0,100);  
-     mg->Fit("f1","", "", 26, 100);
+     mg->Fit("f1","", "", 0, 90);
      mg->GetXaxis()->SetTitle("Dose [Gy]");
      mg->GetYaxis()->SetTitle("Mean diff [%]");
      gPad->BuildLegend();   
