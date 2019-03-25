@@ -310,7 +310,7 @@ int showratio_row(const char *partition, vector<int> & runs, int row1, int row2,
     stitle.Form("%s PMT %2.2d integrals ratio",partition,ip+1);
     TObject * h1 = gROOT->FindObject(sname);
     if (h1) h1->Delete();
-    hist[ip] = new TH1F(sname, stitle, 400, -20., 20.);
+    hist[ip] = new TH1F(sname, stitle, 400, -100., 400.);
     for(int imod=0; imod<65; imod++){
       if (goodR[imod][ip]) {
         hist[ip]->Fill((int_ratio[imod][ip]-1.)*100.);
