@@ -324,17 +324,26 @@ int showratio_row(const char *partition, vector<int> & runs, int row1, int row2,
     if (h1) h1->Delete();
     hist[ip] = new TH1F(sname, stitle, 60, -30., 30.);
     for(int imod=0; imod<65; imod++){
+      if ( (ip==6 || ip==7 || ip==10 || ip==11 || ip==40 || ip==41) && 
+           ( (imod>=38 && imod<=41) || (imod>=54 && imod<=57) ) ) {
+	continue;
+      }
       if (goodR[imod][ip]) {
         hist[ip]->Fill((int_ratio[imod][ip]-1.)*100.);
       }
     }
     //cout << "FILLING the hists" << endl;
-    mean.push_back(hist[ip]->GetMean());
+    //mean.push_back(hist[ip]->GetMean());
     if (hist[ip]->GetEntries() > 0) {
       rms.push_back(hist[ip]->GetRMS());
+      hist[ip]->Fit("gaus", "", "", -20, 20);
+      TF1* ffun = hist[ip]->GetFunction("gaus");
+      double Mean = ffun->GetParameter(1);
+      mean.push_back(Mean);
       //cout << "PMT: " << ip+1 << " RMS: " << hist[ip]->GetRMS() << endl;
     } else {
       rms.push_back(-0.1);
+      mean.push_back(-0.1);
     }
    }
   
@@ -355,18 +364,16 @@ int showratio_row(const char *partition, vector<int> & runs, int row1, int row2,
     TCanvas* C = new TCanvas(sname,stitle,10,10,1000,800);
     C->Divide(4,3);
   
-    vector<int> EB_filled;
+    vector<int> filled;
  
     for(int ip=0; ip<48; ip++){
-	if(hist[ip]->GetEntries() > 0) EB_filled.push_back(ip);
+	if(hist[ip]->GetEntries() > 0) filled.push_back(ip);
     }
      
-    cout << EB_filled.size() << endl;
- 
     for (int cnt=0; cnt<10; ++cnt) {
         C->cd(cnt+1);
- 	hist[EB_filled[cnt]]->Draw();
-        hist[EB_filled[cnt]]->Fit("gaus");
+ 	hist[filled[cnt]]->Draw();
+       // hist[filled[cnt]]->Fit("gaus");
     }
     cout << "Saving Canvas with hists..." << endl;
     sname.Form("c_%s_run_%5.5d_r%d_r%d.png",partition, runs[runs.size()-1], row1+1, row2+1);
