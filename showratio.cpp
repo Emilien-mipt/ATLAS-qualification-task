@@ -366,6 +366,7 @@ int showratio_row(const char *partition, vector<int> & runs, int row1, int row2,
     for (int cnt=0; cnt<10; ++cnt) {
         C->cd(cnt+1);
  	hist[EB_filled[cnt]]->Draw();
+        hist[EB_filled[cnt]]->Fit("gaus");
     }
     cout << "Saving Canvas with hists..." << endl;
     sname.Form("c_%s_run_%5.5d_r%d_r%d.png",partition, runs[runs.size()-1], row1+1, row2+1);
