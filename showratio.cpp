@@ -167,13 +167,13 @@ int showratio(const char *partition, int run_1, int run_2, int row, vector<doubl
   //Reading Run_1
   file = integral_file(run_1);
   TEST(readint(file.c_str(), partition, R1.integrals, R1.problems)) {
-      //cout << "Integrals have been read from file " << file << endl;
+      cout << "Integrals have been read from file " << file << endl;
   }
 
   //Reading Run_2
   file = integral_file(run_2);
   TEST(readint(file.c_str(), partition, R2.integrals, R2.problems)) {
-      //cout << "Integrals have been read from file " << file << endl;
+      cout << "Integrals have been read from file " << file << endl;
   }
 
   //Array which contains the ratio of values 
@@ -277,6 +277,8 @@ int showratio_row(const char *partition, vector<int> & runs, int row1, int row2,
   memset(int_ratio,0,sizeof(float)*65*48);
   memset(goodR,0,sizeof(bool)*65*48);
 
+  // for (size_t ir=0; ir<std::min(3,runs.size()); ++ir) {
+  // for (size_t ir=max(3,runs.size())-3; ir<runs.size(); ++ir) {
   for (size_t ir=0; ir<runs.size(); ++ir) {
     int run=runs[ir];
       
@@ -284,7 +286,7 @@ int showratio_row(const char *partition, vector<int> & runs, int row1, int row2,
     Run R1;
     string file = integral_file(run);
     TEST(readint(file.c_str(), partition, R1.integrals, R1.problems)) {
-        //cout << "Integrals have been read from file " << file << endl;
+        cout << "Integrals have been read from file " << file << endl;
     }
     
     //Array which contains the ratio of values 
@@ -294,6 +296,16 @@ int showratio_row(const char *partition, vector<int> & runs, int row1, int row2,
           R1.good[imod][ip][row] = (R1.problems[imod][ip][row]<16 && R1.integrals[imod][ip][row]>300);
         }
         if (R1.good[imod][ip][row1] && R1.good[imod][ip][row2]) {
+       //   float r1=R1.integrals[imod][ip][row1]/R1.integrals[imod][ip][row2];
+         // if (goodR[imod][ip]) {
+         //   float v1 = (r1-1.);
+         //   float v2 = (int_ratio[imod][ip]-1.);
+         //   if (fabs(v1)<fabs(v2)) {
+         //     int_ratio[imod][ip] = r1;
+         //   } 
+         // } else {
+         //   int_ratio[imod][ip] = r1;
+         //}
           int_ratio[imod][ip] = R1.integrals[imod][ip][row1]/R1.integrals[imod][ip][row2];
           goodR[imod][ip] = true;
         }
@@ -310,7 +322,7 @@ int showratio_row(const char *partition, vector<int> & runs, int row1, int row2,
     stitle.Form("%s PMT %2.2d integrals ratio",partition,ip+1);
     TObject * h1 = gROOT->FindObject(sname);
     if (h1) h1->Delete();
-    hist[ip] = new TH1F(sname, stitle, 400, -100., 400.);
+    hist[ip] = new TH1F(sname, stitle, 60, -30., 30.);
     for(int imod=0; imod<65; imod++){
       if (goodR[imod][ip]) {
         hist[ip]->Fill((int_ratio[imod][ip]-1.)*100.);
@@ -324,8 +336,41 @@ int showratio_row(const char *partition, vector<int> & runs, int row1, int row2,
     } else {
       rms.push_back(-0.1);
     }
-   }    
+   }
+  
+  //Drawing
+  //create all canvas
+    gROOT->SetStyle("Plain");
+    gStyle->SetOptStat(111110);
+    gStyle->SetOptFit(1111);
+    gStyle->SetStatW(0.25);
+    gStyle->SetStatH(0.15);
+    gStyle->SetFrameLineWidth(2);
+    gStyle->SetLineWidth(2);
+    gStyle->SetPalette(1);
 
+    sname.Form("All_pmt_ratio_mb%d", 1);
+    stitle.Form("All PMTs Ratio motherboard %d", 1);
+
+    TCanvas* C = new TCanvas(sname,stitle,10,10,1000,800);
+    C->Divide(4,3);
+  
+    vector<int> EB_filled;
+ 
+    for(int ip=0; ip<48; ip++){
+	if(hist[ip]->GetEntries() > 0) EB_filled.push_back(ip);
+    }
+     
+    cout << EB_filled.size() << endl;
+ 
+    for (int cnt=0; cnt<10; ++cnt) {
+        C->cd(cnt+1);
+ 	hist[EB_filled[cnt]]->Draw();
+    }
+    cout << "Saving Canvas with hists..." << endl;
+    sname.Form("c_%s_run_%5.5d_r%d_r%d.png",partition, runs[runs.size()-1], row1+1, row2+1);
+    C->SaveAs(sname);
+    delete C;
   return 0;
 }
 ///////////////////////////////////////////////////SHOWRATIO_ROW//////////////////////////////////////////////////////////////////
