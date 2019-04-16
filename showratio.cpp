@@ -296,16 +296,6 @@ int showratio_row(const char *partition, vector<int> & runs, int row1, int row2,
           R1.good[imod][ip][row] = (R1.problems[imod][ip][row]<16 && R1.integrals[imod][ip][row]>300);
         }
         if (R1.good[imod][ip][row1] && R1.good[imod][ip][row2]) {
-       //   float r1=R1.integrals[imod][ip][row1]/R1.integrals[imod][ip][row2];
-         // if (goodR[imod][ip]) {
-         //   float v1 = (r1-1.);
-         //   float v2 = (int_ratio[imod][ip]-1.);
-         //   if (fabs(v1)<fabs(v2)) {
-         //     int_ratio[imod][ip] = r1;
-         //   } 
-         // } else {
-         //   int_ratio[imod][ip] = r1;
-         //}
           int_ratio[imod][ip] = R1.integrals[imod][ip][row1]/R1.integrals[imod][ip][row2];
           goodR[imod][ip] = true;
         }
@@ -333,22 +323,23 @@ int showratio_row(const char *partition, vector<int> & runs, int row1, int row2,
       }
     }
     //cout << "FILLING the hists" << endl;
-    //mean.push_back(hist[ip]->GetMean());
+    mean.push_back(hist[ip]->GetMean());
     if (hist[ip]->GetEntries() > 0) {
       rms.push_back(hist[ip]->GetRMS());
-      hist[ip]->Fit("gaus", "", "", -20, 20);
-      TF1* ffun = hist[ip]->GetFunction("gaus");
-      double Mean = ffun->GetParameter(1);
-      mean.push_back(Mean);
+    //  hist[ip]->Fit("gaus", "", "", -20, 20);
+    //  TF1* ffun = hist[ip]->GetFunction("gaus");
+    //  double Mean = ffun->GetParameter(1);
+    //  mean.push_back(Mean);
       //cout << "PMT: " << ip+1 << " RMS: " << hist[ip]->GetRMS() << endl;
     } else {
       rms.push_back(-0.1);
-      mean.push_back(-0.1);
+    //  mean.push_back(-0.1);
     }
    }
   
   //Drawing
   //create all canvas
+  /*
     gROOT->SetStyle("Plain");
     gStyle->SetOptStat(111110);
     gStyle->SetOptFit(1111);
@@ -379,6 +370,7 @@ int showratio_row(const char *partition, vector<int> & runs, int row1, int row2,
     sname.Form("c_%s_run_%5.5d_r%d_r%d.png",partition, runs[runs.size()-1], row1+1, row2+1);
     C->SaveAs(sname);
     delete C;
+  */
   return 0;
 }
 ///////////////////////////////////////////////////SHOWRATIO_ROW//////////////////////////////////////////////////////////////////

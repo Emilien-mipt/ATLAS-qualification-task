@@ -1,5 +1,5 @@
 16.04.2019
-1) Add the last points to the degradation vs time plot
+1) Add the last points to the degradation vs time plot DONE
 2) Join the separate cells with lines on degradation vs dose plot
 3) Find the modules which go out of 20 range more times than the others
 4) Build plots for different modules
