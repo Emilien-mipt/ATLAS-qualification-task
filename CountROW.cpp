@@ -45,7 +45,8 @@
 #define iEBC 3
 #define nPART 4
 
-//double RMS_errors[48][13];
+map<int, int> exceed_20;
+map<int, int> exceed_30;
 
 const int nsetsize = 80;
 
@@ -279,15 +280,15 @@ void CountROW(const char *partition, int row_1, int row_2, int iopt=4)
     }
     err_y.clear();
     err_y.resize(nsetsize, ratio_rms(ipart,ip,row_1-1,row_2-1));
-    TGraphErrors *gr = new TGraphErrors(date_all[ip].size(),&(date_all[ip][0]),&(mean_all[ip][0]),&(err_x[0]),&(err_y[0]));
-    //TGraphErrors *gr = new TGraphErrors(dose_all[ip].size(),&(dose_all[ip][0]),&(mean_all[ip][0]),&(err_x[0]),&(err_y[0]));
+    //TGraphErrors *gr = new TGraphErrors(date_all[ip].size(),&(date_all[ip][0]),&(mean_all[ip][0]),&(err_x[0]),&(err_y[0]));
+    TGraphErrors *gr = new TGraphErrors(dose_all[ip].size(),&(dose_all[ip][0]),&(mean_all[ip][0]),&(err_x[0]),&(err_y[0]));
     gr->SetName(sname);
     gr->SetTitle(stitle);
-    gr->GetXaxis()->SetTitle("Date [month and year]");
-    //gr->GetXaxis()->SetTitle("Dose [Gy]");
-    gr->GetXaxis()->SetTimeDisplay(1);
-    gr->GetXaxis()->SetTimeFormat(timeformat); 
-    gr->GetXaxis()->SetLabelOffset(0.02); 
+    //gr->GetXaxis()->SetTitle("Date [month and year]");
+    gr->GetXaxis()->SetTitle("Dose [Gy]");
+    //gr->GetXaxis()->SetTimeDisplay(1);
+    //gr->GetXaxis()->SetTimeFormat(timeformat); 
+    //gr->GetXaxis()->SetLabelOffset(0.02); 
     gr->GetYaxis()->SetTitle("Mean diff [%]");
     gr_diff[ip] = gr;
   }
@@ -506,6 +507,18 @@ void CountROW(const char *partition, int row_1, int row_2, int iopt=4)
     sname.Form("c4_%s_r%d_r%d_p%lu.png",partition,row_1,row_2,i+1);
     c4[i]->SaveAs(sname);
   }
+
+  // Printing the maps
+  cout << "Modules that exceed 20: " << endl;
+  for(auto m: exceed_20){
+     cout << "imod: " << m.first << "-" << m.second << endl;
+  }
+
+  cout << "Modules that exceed 30: " << endl;
+  for(auto m: exceed_30){
+     cout << "imod: " << m.first << "-" << m.second << endl;
+  }
+
 
   return;
 }

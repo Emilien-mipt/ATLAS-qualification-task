@@ -24,7 +24,9 @@
     
 using namespace std;
 
-//extern double RMS_errors[48][13];
+extern map<int, int> exceed_20;
+extern map<int, int> exceed_30;
+
 
 //Fuction for reading integrals
 int readint(const char* filename, const char* partition, float integrals[65][48][13], int problems[65][48][13]){
@@ -277,8 +279,6 @@ int showratio_row(const char *partition, vector<int> & runs, int row1, int row2,
   memset(int_ratio,0,sizeof(float)*65*48);
   memset(goodR,0,sizeof(bool)*65*48);
 
-  // for (size_t ir=0; ir<std::min(3,runs.size()); ++ir) {
-  // for (size_t ir=max(3,runs.size())-3; ir<runs.size(); ++ir) {
   for (size_t ir=0; ir<runs.size(); ++ir) {
     int run=runs[ir];
       
@@ -316,27 +316,32 @@ int showratio_row(const char *partition, vector<int> & runs, int row1, int row2,
     for(int imod=0; imod<65; imod++){
       if ( (ip==6 || ip==7 || ip==10 || ip==11 || ip==40 || ip==41) && 
            ( (imod>=38 && imod<=41) || (imod>=54 && imod<=57) ) ) {
-	continue;
+      	continue;
       }
       if (goodR[imod][ip]) {
         hist[ip]->Fill((int_ratio[imod][ip]-1.)*100.);
       }
+      if((ip==6 || ip==7 || ip==10 || ip==11 || ip==20 || ip==21 || ip==28 || ip==29 || ip==40 || ip==41) && 
+        ((int_ratio[imod][ip]-1.)*100. < -20. || (int_ratio[imod][ip]-1.)*100. > 20.)){
+         if(exceed_20.count(imod)) exceed_20[imod] += 1;
+         else exceed_20[imod] = 1;
+      }
+      if((ip==6 || ip==7 || ip==10 || ip==11 || ip==20 || ip==21 || ip==28 || ip==29 || ip==40 || ip==41) &&
+        ((int_ratio[imod][ip]-1.)*100. < -30. || (int_ratio[imod][ip]-1.)*100. > 30.)){
+         if(exceed_30.count(imod)) exceed_30[imod] += 1;
+         else exceed_30[imod] = 1;
+      }     
     }
-    //cout << "FILLING the hists" << endl;
+    cout << endl;
     mean.push_back(hist[ip]->GetMean());
     if (hist[ip]->GetEntries() > 0) {
       rms.push_back(hist[ip]->GetRMS());
-    //  hist[ip]->Fit("gaus", "", "", -20, 20);
-    //  TF1* ffun = hist[ip]->GetFunction("gaus");
-    //  double Mean = ffun->GetParameter(1);
-    //  mean.push_back(Mean);
-      //cout << "PMT: " << ip+1 << " RMS: " << hist[ip]->GetRMS() << endl;
     } else {
       rms.push_back(-0.1);
-    //  mean.push_back(-0.1);
     }
-   }
-  
+  }
+ 
+ 
   //Drawing
   //create all canvas
   /*
