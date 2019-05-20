@@ -321,6 +321,7 @@ int showratio_row(const char *partition, vector<int> & runs, int row1, int row2,
       if (goodR[imod][ip]) {
         hist[ip]->Fill((int_ratio[imod][ip]-1.)*100.);
       }
+      //Filling the maps
       if((ip==6 || ip==7 || ip==10 || ip==11 || ip==20 || ip==21 || ip==28 || ip==29 || ip==40 || ip==41) && 
         ((int_ratio[imod][ip]-1.)*100. < -20. || (int_ratio[imod][ip]-1.)*100. > 20.)){
          if(exceed_20.count(imod)) exceed_20[imod] += 1;
@@ -330,7 +331,13 @@ int showratio_row(const char *partition, vector<int> & runs, int row1, int row2,
         ((int_ratio[imod][ip]-1.)*100. < -30. || (int_ratio[imod][ip]-1.)*100. > 30.)){
          if(exceed_30.count(imod)) exceed_30[imod] += 1;
          else exceed_30[imod] = 1;
-      }     
+      }
+      //Exclude the "bad" modules for EBA barrels
+      if((ip==6 || ip==7 || ip==10 || ip==11 || ip==20 || ip==21 || ip==28 || ip==29 || ip==40 || ip==41) &&
+        (imod == 34 || imod == 35 || imod == 36 || imod == 38 || imod == 39 || imod == 56 || imod == 57 || imod == 59 || imod == 60 || imod == 61 || imod == 64))
+      { 
+         continue;
+      }    
     }
     cout << endl;
     mean.push_back(hist[ip]->GetMean());
