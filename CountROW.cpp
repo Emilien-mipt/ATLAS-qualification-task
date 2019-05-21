@@ -442,8 +442,9 @@ void CountROW(const char *partition, int row_1, int row_2, int iopt=4)
      h1->SetTitle(stitle);
      h1->SetFillStyle(0);
      h1->SetMarkerSize(1.0);
-     mg->Add(h1);
+     mg->Add(h1, "APL");
 
+/*
      for(int ip = 1; ip < pmt_number.size(); ip++){
            cout << "Step " << ip << endl;
            TGraphErrors * h = gr_diff[pmt_number[ip]];
@@ -470,7 +471,7 @@ void CountROW(const char *partition, int row_1, int row_2, int iopt=4)
            mg->Add(h);
      }
 
-
+*/
 
 
      mg->Draw("AP");         
@@ -488,7 +489,7 @@ void CountROW(const char *partition, int row_1, int row_2, int iopt=4)
   //save all canvas
   std::cout << "Saving Canvas..." << std::endl;
   
-  sname.Form("C_%s_r%d_r%d.png",partition,row_1,row_2);
+  sname.Form("C_%s_r%d_r%d_A12_pmt7.png",partition,row_1,row_2);
   C->SaveAs(sname);
 
   for (size_t i=0; i<c1.size(); ++i) {
