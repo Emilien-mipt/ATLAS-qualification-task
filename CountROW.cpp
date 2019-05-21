@@ -45,8 +45,8 @@
 #define iEBC 3
 #define nPART 4
 
-map<int, int> exceed_20;
-map<int, int> exceed_30;
+map<string, int> exceed_30;
+map<int, int> exceed_30_imod;
 
 const int nsetsize = 80;
 
@@ -509,16 +509,15 @@ void CountROW(const char *partition, int row_1, int row_2, int iopt=4)
   }
 
   // Printing the maps
-  cout << "Modules that exceed 20: " << endl;
-  for(auto m: exceed_20){
-     cout << "imod: " << m.first << "-" << m.second << endl;
+  cout << "Cells that exceed 30: " << endl;
+  for(auto m: exceed_30){
+     cout << m.first << ": " << m.second << endl;
   }
 
   cout << "Modules that exceed 30: " << endl;
-  for(auto m: exceed_30){
-     cout << "imod: " << m.first << "-" << m.second << endl;
+  for(auto m: exceed_30_imod){
+     cout << "imod " << m.first << ": " << m.second << endl;
   }
-
 
   return;
 }

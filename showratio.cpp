@@ -24,8 +24,8 @@
     
 using namespace std;
 
-extern map<int, int> exceed_20;
-extern map<int, int> exceed_30;
+extern map<string, int> exceed_30;
+extern map<int, int> exceed_30_imod;
 
 
 //Fuction for reading integrals
@@ -322,19 +322,36 @@ int showratio_row(const char *partition, vector<int> & runs, int row1, int row2,
         hist[ip]->Fill((int_ratio[imod][ip]-1.)*100.);
       }
       //Filling the maps
-      if((ip==6 || ip==7 || ip==10 || ip==11 || ip==20 || ip==21 || ip==28 || ip==29 || ip==40 || ip==41) && 
-        ((int_ratio[imod][ip]-1.)*100. < -20. || (int_ratio[imod][ip]-1.)*100. > 20.)){
-         if(exceed_20.count(imod)) exceed_20[imod] += 1;
-         else exceed_20[imod] = 1;
-      }
       if((ip==6 || ip==7 || ip==10 || ip==11 || ip==20 || ip==21 || ip==28 || ip==29 || ip==40 || ip==41) &&
-        ((int_ratio[imod][ip]-1.)*100. < -30. || (int_ratio[imod][ip]-1.)*100. > 30.)){
-         if(exceed_30.count(imod)) exceed_30[imod] += 1;
-         else exceed_30[imod] = 1;
+        (((int_ratio[imod][ip]-1.)*100. < -30. || (int_ratio[imod][ip]-1.)*100. > 30.) && ((int_ratio[imod][ip]-1.)*100.!=-100))){
+         //First fill modules
+         if(exceed_30_imod.count(imod)) exceed_30_imod[imod] += 1;
+         else exceed_30_imod[imod] = 1;
+         //Now cells
+         if(ip == 6 || ip == 7){
+            if(exceed_30.count("A12")) exceed_30["A12"] += 1;
+            else exceed_30["A12"] = 1;
+         }
+         if(ip == 10 || ip == 11){
+            if(exceed_30.count("A13")) exceed_30["A13"] += 1;
+            else exceed_30["A13"] = 1;
+         }
+         if(ip == 20 || ip == 21){
+            if(exceed_30.count("A14")) exceed_30["A14"] += 1;
+            else exceed_30["A14"] = 1;
+         }
+         if(ip == 28 || ip == 29){
+            if(exceed_30.count("A15")) exceed_30["A15"] += 1;
+            else exceed_30["A15"] = 1;
+         }
+         if(ip == 40 || ip == 41){
+            if(exceed_30.count("A16")) exceed_30["A16"] += 1;
+            else exceed_30["A16"] = 1;
+         }
       }
       //Exclude the "bad" modules for EBA barrels
       if((ip==6 || ip==7 || ip==10 || ip==11 || ip==20 || ip==21 || ip==28 || ip==29 || ip==40 || ip==41) &&
-        (imod == 34 || imod == 35 || imod == 36 || imod == 38 || imod == 39 || imod == 56 || imod == 57 || imod == 59 || imod == 60 || imod == 61 || imod == 64))
+        (imod == 34 || imod == 35 || imod == 36 || imod == 59 || imod == 60 || imod == 61))
       { 
          continue;
       }    
